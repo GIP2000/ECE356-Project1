@@ -3,6 +3,7 @@
 #include <fstream>
 #include <regex> 
 #include "hash.h"
+#include <chrono>
 
 using namespace std;
 
@@ -27,12 +28,16 @@ hashTable buildDictionary(){
     cout << "What is the path of dictionary file\n";
     string dictionaryPath; 
     cin >> dictionaryPath; 
+    auto start = chrono::steady_clock::now(); 
     ifstream dictionaryFile(dictionaryPath); 
     if(dictionaryFile.is_open()){
         string word; 
         while(getline(dictionaryFile, word))
             table.insert(word);
     }
+    auto end = chrono::steady_clock::now(); 
+    chrono::duration<double> timeInSeconds = end-start; 
+    cout << "Time it took to read dictionary is " << timeInSeconds.count() << "s\n"; 
     return table; 
 }
 
@@ -46,6 +51,7 @@ void checkWord (hashTable dictionary, string word, int lineCount, ofstream& outp
 }
 
 void sepAndCheckWords(hashTable dictionary,string documentName, string outputDocumentName){
+    auto start = chrono::steady_clock::now(); 
     ifstream document(documentName);
     ofstream outputDocument(outputDocumentName); 
     if(document.is_open()){
@@ -61,6 +67,9 @@ void sepAndCheckWords(hashTable dictionary,string documentName, string outputDoc
             lineCount++;
         }
     }
+    auto end = chrono::steady_clock::now(); 
+    chrono::duration<double> timeInSeconds = end-start; 
+    cout << "Time it took to spell check file is " << timeInSeconds.count() << "s\n"; 
 }
 
 void spellCheck(hashTable dictionary){
