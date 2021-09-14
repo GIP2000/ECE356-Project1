@@ -9,7 +9,7 @@ hashTable::hashTable(int size){
 }
 
 int hashTable::insert(const string &key, void *pv){
-    if(key.size() > 20 ) return 3; // if key is too large for dictionary, (should never happen)
+    //if(key.size() > 20 ) return 3; // if key is too large for dictionary, (should never happen)
     if(filled/capacity > .5){
         const bool success = this->rehash(); 
         if(!success) return 2; 
