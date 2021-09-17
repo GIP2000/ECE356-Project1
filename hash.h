@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <string>
+#include <tuple>
+#include<functional>
 
 class hashTable {
 
@@ -81,6 +83,17 @@ class hashTable {
   // Return a prime number at least as large as size.
   // Uses a precomputed sequence of selected prime numbers.
   static unsigned int getPrime(int size);
+
+  // loop function for iterating over hashtable
+  // this function returns a tuple first value if it should immediatly return or not (vs use the value for something else)
+  // second is what the value is 
+  // initalSpace is the starting spot
+  // func is a function which is called on each iteration
+  // the inner function returns a tuple the first value of the tuple is what would be returned
+  // the second value is if to return
+  // the third value is if to break i.e. use the value or not
+  // returns the return value if specified otherwise -1 on completion of loop
+  std::tuple<bool,int> loop(const int initalSpace,const std::string& key, std::function<std::tuple<int,bool,bool>(hashTable::hashItem,int,std::string)> func); 
 };
 
 #endif //_HASH_H

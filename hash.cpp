@@ -1,5 +1,7 @@
 #include "./hash.h"
 #include <vector>
+#include <tuple>
+#include <functional>
 
 using namespace std;
 
@@ -9,24 +11,20 @@ hashTable::hashTable(int size){
 }
 
 int hashTable::insert(const string &key, void *pv){
-    //if(key.size() > 20 ) return 3; // if key is too large for dictionary, (should never happen)
     if(filled/capacity > .5){
         const bool success = this->rehash(); 
         if(!success) return 2; 
     }
     const int initalSpace = this->hash(key); 
-    int index = initalSpace; 
-    bool wrap = false;
-    while(!wrap || index < initalSpace){
-        hashTable::hashItem item = this->data[index];
+    tuple<bool,int> result = this->loop(initalSpace,key,[](hashTable::hashItem item, int index, string key){
         if(!item.isDeleted){
-            if(item.isOccupied && item.key == key) return 1; 
-            if(!item.isOccupied) break;
+            if(item.isOccupied && item.key == key) return make_tuple(1,true,false); //return 1; 
+            if(!item.isOccupied) return make_tuple(index,false,true);
         }
-        index = (index +1) % this->capacity;
-        if (index <= initalSpace) wrap = true;
-    }
-    if(wrap && index >= initalSpace) return 4; // no available space (should never happen if we rehash correctly)
+        return make_tuple(0,false,false);
+    });
+    if(get<0>(result)) return get<1>(result);
+    const int index = get<1>(result); 
     this->data[index].key = key;
     this->data[index].isOccupied = true; 
     this->data[index].pv = pv; 
@@ -70,17 +68,28 @@ int hashTable::hash(const std::string &key){
 
 int hashTable::findPos(const std::string &key){
     const int initalSpace = this->hash(key); 
-    int index = initalSpace; 
-    bool wrap = false;
-    while(!wrap || index < initalSpace){
-        hashTable::hashItem item = this->data[index]; 
+    tuple<bool,int> result = this->loop(initalSpace,key,[](hashTable::hashItem item, int index, string key){
         if(!item.isDeleted && item.isOccupied && item.key == key)
-            return index; 
+            return make_tuple(index,true,false);
+        return make_tuple(-1,false,false);
+    });
+    return get<1>(result); 
+    
+    
+}
+tuple<bool,int> hashTable::loop(const int initalSpace,const string& key, function<tuple<int,bool,bool>(hashTable::hashItem,int,string)> func){
+    bool wrap = false;
+    int index = initalSpace;
+    tuple<int,bool,bool> values;
+    while(!wrap || index < initalSpace){
+        hashTable::hashItem item = this->data[index];
+        values = func(item,index,key);
+        if(get<1>(values)) return make_tuple(true,get<0>(values));
+        if(get<2>(values)) return make_tuple(false,get<0>(values));
         index = (index + 1) % this->capacity;
         if (index <= initalSpace) wrap = true;
     }
-    return -1; 
-    
+    return make_tuple(true,-1); 
 }
 
 bool hashTable::rehash(){
