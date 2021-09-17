@@ -32,8 +32,10 @@ hashTable buildDictionary(){
     ifstream dictionaryFile(dictionaryPath); 
     if(dictionaryFile.is_open()){
         string word; 
-        while(getline(dictionaryFile, word))
+        while(getline(dictionaryFile, word)){
+            toLowerCase(word); 
             table.insert(word);
+        }
     }
     auto end = chrono::steady_clock::now(); 
     chrono::duration<double> timeInSeconds = end-start; 
@@ -56,7 +58,7 @@ void sepAndCheckWords(hashTable dictionary,string documentName, string outputDoc
     ofstream outputDocument(outputDocumentName); 
     if(document.is_open()){
         string line; 
-        regex r("([\\w-']+)"); 
+        regex r("([\\w'-]+)");  
         int lineCount = 1;
         while(getline(document,line)){
             smatch match; 
