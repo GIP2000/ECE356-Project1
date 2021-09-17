@@ -75,7 +75,9 @@ int hashTable::findPos(const std::string &key){
     while(!wrap || index < initalSpace){
         hashTable::hashItem item = this->data[index]; 
         if(!item.isDeleted && item.isOccupied && item.key == key)
-            return index; 
+            return index;
+        if(!item.isOccupied)
+            return -1; 
         index = (index + 1) % this->capacity;
         if (index <= initalSpace) wrap = true;
     }
