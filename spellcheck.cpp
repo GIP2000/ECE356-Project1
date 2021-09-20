@@ -66,7 +66,7 @@ void sepAndCheckWords(hashTable& dictionary,string documentName, string outputDo
     ofstream outputDocument(outputDocumentName); 
     if(document.is_open()){
         string line; 
-        regex r("([\\w'-]+)");
+        regex r("([a-zA-Z0-9'-]+)");
         int lineCount = 1;
         while(getline(document,line)){
             smatch match; 
