@@ -41,6 +41,7 @@ hashTable buildDictionary(){
             table.insert(word);
         }
     }
+    dictionaryFile.close(); 
     auto end = chrono::steady_clock::now(); 
     chrono::duration<double> timeInSeconds = end-start; 
     cout << "Time it took to read dictionary is " << timeInSeconds.count() << "s\n"; 
@@ -50,15 +51,16 @@ hashTable buildDictionary(){
 
 // checks if an individual word is valid.
 // If not it will use one of the above error funcitons to indicate so
-void checkWord (hashTable dictionary, string word, int lineCount, ofstream& outputDocument){
+void checkWord (hashTable& dictionary, string word, int lineCount, ofstream& outputDocument){
     toLowerCase(word);
     if(word.size() > 20) return writeLengthError(lineCount,word, outputDocument);
     if(word.find_first_of("0123456789") != string::npos || dictionary.contains(word)) return; 
     return writeWordNotFound(lineCount,word, outputDocument); 
 }
 
+
 // seperates an input document into valid words and checks if the word is valid or not
-void sepAndCheckWords(hashTable dictionary,string documentName, string outputDocumentName){
+void sepAndCheckWords(hashTable& dictionary,string documentName, string outputDocumentName){
     auto start = chrono::steady_clock::now(); 
     ifstream document(documentName);
     ofstream outputDocument(outputDocumentName); 
@@ -67,6 +69,7 @@ void sepAndCheckWords(hashTable dictionary,string documentName, string outputDoc
         regex r("([\\w'-]+)");
         int lineCount = 1;
         while(getline(document,line)){
+            // sepAndCheckLine(dictionary,line,lineCount, outputDocument);
             smatch match; 
             while(regex_search(line,match,r)){
                 checkWord(dictionary,match[0],lineCount, outputDocument); 
@@ -75,13 +78,15 @@ void sepAndCheckWords(hashTable dictionary,string documentName, string outputDoc
             lineCount++;
         }
     }
+    document.close(); 
+    outputDocument.close(); 
     auto end = chrono::steady_clock::now(); 
     chrono::duration<double> timeInSeconds = end-start; 
     cout << "Time it took to spell check file is " << timeInSeconds.count() << "s\n"; 
 }
 
 // gets the input and otuput file names and initates spell check 
-void spellCheck(hashTable dictionary){
+void spellCheck(hashTable& dictionary){
     cout << "What is the name of the spellcheck document\n"; 
     string documentName,outputDocumentName;
     cin >> documentName;
@@ -92,6 +97,7 @@ void spellCheck(hashTable dictionary){
 
 
 int main(){
-    spellCheck(buildDictionary());
+    hashTable table = buildDictionary(); 
+    spellCheck(table);
     return 0; 
 }
