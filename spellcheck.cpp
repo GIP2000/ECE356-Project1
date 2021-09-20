@@ -69,7 +69,6 @@ void sepAndCheckWords(hashTable& dictionary,string documentName, string outputDo
         regex r("([\\w'-]+)");
         int lineCount = 1;
         while(getline(document,line)){
-            // sepAndCheckLine(dictionary,line,lineCount, outputDocument);
             smatch match; 
             while(regex_search(line,match,r)){
                 checkWord(dictionary,match[0],lineCount, outputDocument); 
