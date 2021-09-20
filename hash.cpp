@@ -9,7 +9,7 @@ hashTable::hashTable(int size){
 }
 
 int hashTable::insert(const string &key, void *pv){
-     if(filled/capacity > .5){
+      if(capacity/2 <= filled){
         const bool success = this->rehash(); 
         if(!success) return 2; 
     }
@@ -84,12 +84,14 @@ int hashTable::findPos(const std::string &key){
     
 }
 
+
 bool hashTable::rehash(){
-    vector<hashTable::hashItem> oldData = {this->data.begin(), this->data.begin() + this->capacity};
+    vector<hashTable::hashItem> oldData = this->data;
     const int newSize = hashTable::getPrime(this->capacity);
     if(newSize == -1) return false;
     this->capacity = newSize;
     this->data = vector<hashTable::hashItem>(this->capacity);
+    this->filled = 0;
     for(auto item: oldData){
         if(item.isOccupied && !item.isDeleted)
             this->insert(item.key,item.pv); 
